@@ -20,9 +20,15 @@ execute if score #game sp_phase matches 0 as @e[type=text_display,tag=sp_control
 # Check current nearby count
 execute if score #game sp_phase matches 0 if score #game sp_countdown matches 1.. store result score #current_near sp_temp if entity @a[tag=sp_near_board]
 
-# Cancel if player count changed
+# Cancel if player count changed and notify who left/entered
+execute if score #game sp_phase matches 0 if score #game sp_countdown matches 1.. unless score #current_near sp_temp = #game sp_expected as @a[tag=sp_was_near,tag=!sp_near_board] run title @a actionbar ["",{"selector":"@s","color":"red"},{"text":" left the zone!","color":"gray"}]
+execute if score #game sp_phase matches 0 if score #game sp_countdown matches 1.. unless score #current_near sp_temp = #game sp_expected as @a[tag=sp_was_near,tag=!sp_near_board] run tellraw @a ["",{"text":"[BG] ","color":"dark_purple"},{"selector":"@s","color":"red"},{"text":" left the zone! Countdown cancelled.","color":"gray"}]
+
+execute if score #game sp_phase matches 0 if score #game sp_countdown matches 1.. unless score #current_near sp_temp = #game sp_expected as @a[tag=!sp_was_near,tag=sp_near_board] run title @a actionbar ["",{"selector":"@s","color":"green"},{"text":" entered the zone!","color":"gray"}]
+execute if score #game sp_phase matches 0 if score #game sp_countdown matches 1.. unless score #current_near sp_temp = #game sp_expected as @a[tag=!sp_was_near,tag=sp_near_board] run tellraw @a ["",{"text":"[BG] ","color":"dark_purple"},{"selector":"@s","color":"green"},{"text":" entered the zone! Countdown cancelled.","color":"gray"}]
+
 execute if score #game sp_phase matches 0 if score #game sp_countdown matches 1.. unless score #current_near sp_temp = #game sp_expected run scoreboard players set #game sp_countdown -1
-execute if score #game sp_phase matches 0 if score #game sp_countdown matches ..-1 if score #game sp_expected matches 1.. run tellraw @a[tag=sp_near_board] ["",{"text":"[BG] ","color":"dark_purple"},{"text":"Player count changed! Press button again.","color":"red"}]
+execute if score #game sp_phase matches 0 if score #game sp_countdown matches ..-1 if score #game sp_expected matches 1.. run playsound minecraft:block.note_block.bass player @a[tag=sp_near_board] ~ ~ ~ 1.0 0.5
 execute if score #game sp_phase matches 0 if score #game sp_countdown matches ..-1 run scoreboard players set #game sp_expected 0
 
 # Decrement
@@ -117,3 +123,9 @@ execute as @e[type=interaction,tag=sp_control_btn] if data entity @s interaction
 execute if score #game sp_phase matches 1.. store result score #alive sp_temp if entity @a[tag=sp_player,scores={sp_money=1..}]
 execute if score #game sp_phase matches 1.. store result score #total_p sp_temp if entity @a[tag=sp_player]
 execute if score #game sp_phase matches 1.. if score #total_p sp_temp matches 2.. if score #alive sp_temp matches ..1 run function board_game:end_game
+
+# ================================================
+# 9) UPDATE PREVIOUS ZONE STATE
+# ================================================
+tag @a remove sp_was_near
+tag @a[tag=sp_near_board] add sp_was_near

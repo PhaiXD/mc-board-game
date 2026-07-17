@@ -26,7 +26,7 @@ execute as @a[tag=sp_player] run item replace entity @s container.23 with air
 execute as @a[tag=sp_player] run item replace entity @s container.25 with air
 
 # --- Give 50M starting money (Round 1 only) ---
-execute if score #game sp_round matches 1 as @a[tag=sp_player] run give @s minecraft:gold_nugget[minecraft:custom_name={text:"1 Million",italic:false,color:"gold"},minecraft:custom_data={sp_money:true}] 50
+execute if score #game sp_round matches 1 as @a[tag=sp_player] run give @s minecraft:gold_nugget[minecraft:custom_name={text:"1 Million",italic:false,color:"gold"},minecraft:custom_data={sp_money:true},minecraft:max_stack_size=99] 50
 
 # --- Draw Cards ---
 # Count current cards
