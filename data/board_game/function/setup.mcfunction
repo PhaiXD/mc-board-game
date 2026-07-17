@@ -9,6 +9,10 @@ scoreboard objectives add sp_round dummy
 scoreboard objectives add sp_confirm trigger "§aReady"
 scoreboard objectives add sp_cards_played dummy
 scoreboard objectives add sp_temp dummy
+scoreboard objectives add sp_temp_c dummy
+scoreboard objectives add sp_temp_e dummy
+scoreboard objectives add sp_temp_s dummy
+scoreboard objectives add sp_temp_t dummy
 scoreboard objectives add sp_calc dummy
 scoreboard objectives add sp_payout dummy
 scoreboard objectives add sp_countdown dummy

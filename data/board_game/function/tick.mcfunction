@@ -79,15 +79,23 @@ execute if score #game sp_phase matches 1.. as @a[tag=sp_player,scores={sp_temp=
 # ================================================
 # 3) CONFIRM BUTTON (carrot_on_a_stick at slot 8)
 # ================================================
-execute as @a[tag=sp_player,scores={sp_use_click=1..}] if score #game sp_phase matches 1..3 run scoreboard players set @s sp_confirm 1
+# Only process click if they aren't already confirmed (sp_confirm=0)
+execute as @a[tag=sp_player,scores={sp_use_click=1..,sp_confirm=0}] if score #game sp_phase matches 1..3 run scoreboard players set @s sp_confirm 1
 scoreboard players set @a sp_use_click 0
 
 # ================================================
 # 4) TRIGGER DETECTION — /trigger sp_confirm
 # ================================================
+# When confirming in Phase 1, capture their current bets
+execute as @a[tag=sp_player,scores={sp_confirm=1}] if score #game sp_phase matches 1 run function board_game:read_bets
+
+# Broadcast ready message
 execute as @a[tag=sp_player,scores={sp_confirm=1}] run tellraw @a ["",{"text":"[BG] ","color":"dark_purple","bold":true},{"selector":"@s","color":"gold"},{"text":" is ready! ✓","color":"green"}]
 execute as @a[tag=sp_player,scores={sp_confirm=1}] run playsound minecraft:block.note_block.chime player @s ~ ~ ~ 1.0 1.5
 execute as @a[tag=sp_player,scores={sp_confirm=1}] run scoreboard players set @s sp_confirm 2
+
+# In Phase 1, check if anyone with sp_confirm=2 has modified their bets
+execute as @a[tag=sp_player,scores={sp_confirm=2}] if score #game sp_phase matches 1 run function board_game:check_bets
 
 # Enable trigger for all players
 scoreboard players enable @a sp_confirm
