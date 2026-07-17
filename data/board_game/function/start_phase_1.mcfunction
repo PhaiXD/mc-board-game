@@ -32,16 +32,23 @@ execute if score #game sp_round matches 1 as @a[tag=sp_player] run give @s minec
 # Count current cards
 execute as @a[tag=sp_player] store result score @s sp_temp run clear @s minecraft:paper[minecraft:custom_data~{sp_card:true}] 0
 
-# Round 1: Give 5 cards
+# Round 1: Give 9 cards
+execute if score #game sp_round matches 1 as @a[tag=sp_player] run function board_game:give_random_card
+execute if score #game sp_round matches 1 as @a[tag=sp_player] run function board_game:give_random_card
+execute if score #game sp_round matches 1 as @a[tag=sp_player] run function board_game:give_random_card
+execute if score #game sp_round matches 1 as @a[tag=sp_player] run function board_game:give_random_card
 execute if score #game sp_round matches 1 as @a[tag=sp_player] run function board_game:give_random_card
 execute if score #game sp_round matches 1 as @a[tag=sp_player] run function board_game:give_random_card
 execute if score #game sp_round matches 1 as @a[tag=sp_player] run function board_game:give_random_card
 execute if score #game sp_round matches 1 as @a[tag=sp_player] run function board_game:give_random_card
 execute if score #game sp_round matches 1 as @a[tag=sp_player] run function board_game:give_random_card
 
-# Round 2+: Draw 1 card (max 6)
-execute if score #game sp_round matches 2.. as @a[tag=sp_player] if score @s sp_temp matches ..5 run function board_game:give_random_card
-
+# Round 2+: Draw 3 cards (max 12 cards total, so draw if ..11)
+execute if score #game sp_round matches 2.. as @a[tag=sp_player] if score @s sp_temp matches ..11 run function board_game:give_random_card
+execute if score #game sp_round matches 2.. as @a[tag=sp_player] store result score @s sp_temp run clear @s minecraft:paper[minecraft:custom_data~{sp_card:true}] 0
+execute if score #game sp_round matches 2.. as @a[tag=sp_player] if score @s sp_temp matches ..11 run function board_game:give_random_card
+execute if score #game sp_round matches 2.. as @a[tag=sp_player] store result score @s sp_temp run clear @s minecraft:paper[minecraft:custom_data~{sp_card:true}] 0
+execute if score #game sp_round matches 2.. as @a[tag=sp_player] if score @s sp_temp matches ..11 run function board_game:give_random_card
 # --- Announce Phase 1 ---
 tellraw @a ["",{"text":"═══════════════════════════════","color":"dark_purple","strikethrough":true},{"text":"\n"},{"text":"  [Phase 1] Place Your Bets!","color":"gold","bold":true},{"text":"\n"},{"text":"  Put Money (Nuggets) in middle slots.","color":"white"},{"text":"\n"},{"text":"  Hold Carrot on a Stick and right click to confirm.","color":"gray","italic":true},{"text":"\n"},{"text":"═══════════════════════════════","color":"dark_purple","strikethrough":true}]
 playsound minecraft:entity.experience_orb.pickup player @a[tag=sp_player] ~ ~ ~ 1.0 1.0

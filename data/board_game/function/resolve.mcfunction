@@ -94,4 +94,4 @@ execute if score #tech sp_board_tech matches 1.. if score @s sp_bet_tech matches
 execute if score #tech sp_board_tech matches 1.. if score @s sp_bet_tech matches 1.. run function board_game:resolve/give_profit with storage board_game:macro
 
 # Update sidebar
-execute store result score @s sp_money run clear @s minecraft:gold_nugget[minecraft:custom_data~{sp_money:true}] 0
+function board_game:update_money

@@ -24,6 +24,7 @@ scoreboard players set #tech sp_board_tech 0
 
 # Clear ALL game items
 clear @a minecraft:gold_nugget[minecraft:custom_data~{sp_money:true}]
+clear @a minecraft:diamond[minecraft:custom_data~{sp_money:true}]
 clear @a minecraft:paper[minecraft:custom_data~{sp_card:true}]
 clear @a minecraft:gray_stained_glass_pane[minecraft:custom_data~{sp_ui:true}]
 clear @a minecraft:red_stained_glass_pane[minecraft:custom_data~{sp_ui:true}]

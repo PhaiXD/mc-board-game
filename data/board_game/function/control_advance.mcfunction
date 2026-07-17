@@ -14,9 +14,9 @@ execute if score #advance_from sp_temp matches 0 if score #game sp_expected matc
 
 # --- IN-GAME: Force advance (admin) ---
 execute if score #advance_from sp_temp matches 1 run function board_game:start_phase_2
-execute if score #advance_from sp_temp matches 2 run function board_game:start_phase_3
-execute if score #advance_from sp_temp matches 3 if score #game sp_round matches ..6 run function board_game:start_phase_1
-execute if score #advance_from sp_temp matches 3 if score #game sp_round matches 7.. run function board_game:end_game
+execute if score #advance_from sp_temp matches 2 run function board_game:resolve_all
+execute if score #advance_from sp_temp matches 2 if score #game sp_round matches ..6 run function board_game:start_phase_1
+execute if score #advance_from sp_temp matches 2 if score #game sp_round matches 7.. run function board_game:end_game
 
 execute if score #advance_from sp_temp matches 1.. run tellraw @a ["",{"text":"[BG] ","color":"dark_purple","bold":true},{"text":"⏩ Phase advanced!","color":"yellow"}]
 execute if score #advance_from sp_temp matches 1.. run playsound minecraft:block.note_block.bell player @a ~ ~ ~ 1.0 1.0

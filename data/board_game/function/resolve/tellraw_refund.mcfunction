@@ -1,0 +1,1 @@
+$tellraw @s ["",{"text":"[BG] ","color":"dark_purple"},{"text":"Refund: ","color":"gray"},{"text":"+","color":"yellow","bold":true},{"score":{"name":"@s","objective":"sp_payout"},"color":"yellow","bold":true},{"text":"M ","color":"yellow","bold":true},{"text":"from ","color":"gray"},{"text":$(project),"color":$(color)},{"text":".","color":"gray"}]

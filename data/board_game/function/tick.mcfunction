@@ -62,8 +62,15 @@ execute unless score #game sp_phase matches 2 as @e[type=interaction,tag=sp_inte
 # ================================================
 # 2) INVENTORY: Money protection + UI lock
 # ================================================
+execute as @a[tag=sp_player] run function board_game:check_exchange
+execute as @a[tag=sp_player] run function board_game:update_money
+
 # Count money BEFORE lock (to detect money lost in glass slots)
 execute if score #game sp_phase matches 1.. as @a[tag=sp_player] store result score @s sp_temp run clear @s minecraft:gold_nugget[minecraft:custom_data~{sp_money:true}] 0
+
+# Global Money Drop Protection (prevent stealing)
+execute as @e[type=item,nbt={Item:{components:{"minecraft:custom_data":{sp_money:true}}}}] unless data entity @s Owner run data modify entity @s Owner set from entity @p UUID
+
 
 # Lock inventory slots
 execute if score #game sp_phase matches 1.. as @a[tag=sp_player] run function board_game:ui/lock_slots
@@ -108,9 +115,9 @@ execute store result score #ready sp_temp if entity @a[tag=sp_player,scores={sp_
 scoreboard players operation #phase_snap sp_temp = #game sp_phase
 
 execute if score #phase_snap sp_temp matches 1 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp run function board_game:start_phase_2
-execute if score #phase_snap sp_temp matches 2 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp run function board_game:start_phase_3
-execute if score #phase_snap sp_temp matches 3 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp if score #game sp_round matches ..6 run function board_game:start_phase_1
-execute if score #phase_snap sp_temp matches 3 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp if score #game sp_round matches 7.. run function board_game:end_game
+execute if score #phase_snap sp_temp matches 2 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp run function board_game:resolve_all
+execute if score #phase_snap sp_temp matches 2 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp if score #game sp_round matches ..6 run function board_game:start_phase_1
+execute if score #phase_snap sp_temp matches 2 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp if score #game sp_round matches 7.. run function board_game:end_game
 
 # ================================================
 # 6) PHASE 2: Card detection on zones
@@ -125,13 +132,7 @@ execute if score #game sp_phase matches 2 as @e[type=interaction,tag=sp_interact
 # ================================================
 execute as @e[type=interaction,tag=sp_control_btn] if data entity @s interaction at @s run function board_game:control_advance
 
-# ================================================
-# 8) BANKRUPT CHECK — last player standing wins
-# ================================================
-execute if score #game sp_phase matches 1.. store result score #alive sp_temp if entity @a[tag=sp_player,scores={sp_money=1..}]
-execute if score #game sp_phase matches 1.. store result score #total_p sp_temp if entity @a[tag=sp_player]
-execute if score #game sp_phase matches 1.. if score #total_p sp_temp matches 2.. if score #alive sp_temp matches ..1 run function board_game:end_game
-
+# Bankrupt check removed to prevent cursor-item bug
 # ================================================
 # 9) UPDATE PREVIOUS ZONE STATE
 # ================================================

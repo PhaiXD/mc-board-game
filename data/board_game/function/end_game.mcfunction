@@ -15,9 +15,13 @@ execute as @a[tag=sp_player] run clear @s minecraft:yellow_stained_glass_pane[mi
 execute as @a[tag=sp_player] run clear @s minecraft:lime_stained_glass_pane[minecraft:custom_data~{sp_ui:true}]
 execute as @a[tag=sp_player] run clear @s minecraft:carrot_on_a_stick[minecraft:custom_data~{sp_confirm_btn:true}]
 
-# Update money one last time
-execute as @a[tag=sp_player] store result score @s sp_money run clear @s minecraft:gold_nugget[minecraft:custom_data~{sp_money:true}] 0
+# Update money one last time (count nuggets and diamonds)
+execute as @a[tag=sp_player] run function board_game:update_money
+
+
+# Clear all money
 execute as @a[tag=sp_player] run clear @s minecraft:gold_nugget[minecraft:custom_data~{sp_money:true}]
+execute as @a[tag=sp_player] run clear @s minecraft:diamond[minecraft:custom_data~{sp_money:true}]
 
 # Game Over
 tellraw @a ["",{"text":"═══════════════════════════════","color":"gold","strikethrough":true},{"text":"\n"},{"text":"  🏆 GAME OVER! 🏆","color":"gold","bold":true},{"text":"\n"},{"text":"═══════════════════════════════","color":"gold","strikethrough":true}]
