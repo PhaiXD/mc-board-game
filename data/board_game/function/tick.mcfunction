@@ -95,6 +95,7 @@ scoreboard players set @a sp_use_click 0
 # ================================================
 # When confirming in Phase 1, capture their current bets
 execute as @a[tag=sp_player,scores={sp_confirm=1}] if score #game sp_phase matches 1 run function board_game:read_bets
+execute as @a[tag=sp_player,scores={sp_confirm=1}] if score #game sp_phase matches 1 run function board_game:check_cap
 
 # Broadcast ready message
 execute as @a[tag=sp_player,scores={sp_confirm=1}] run tellraw @a ["",{"text":"[BG] ","color":"dark_purple","bold":true},{"selector":"@s","color":"gold"},{"text":" is ready! ✓","color":"green"}]

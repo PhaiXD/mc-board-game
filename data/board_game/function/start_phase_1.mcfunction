@@ -16,6 +16,12 @@ scoreboard players set #estate sp_board_estate 0
 scoreboard players set #startup sp_board_startup 0
 scoreboard players set #tech sp_board_tech 0
 
+# --- Reset total bets from previous round ---
+scoreboard players set #totals sp_total_crypto 0
+scoreboard players set #totals sp_total_estate 0
+scoreboard players set #totals sp_total_startup 0
+scoreboard players set #totals sp_total_tech 0
+
 # --- Clear UI ---
 execute as @a[tag=sp_player] run clear @s minecraft:red_stained_glass_pane[minecraft:custom_data~{sp_ui:true}]
 
@@ -56,8 +62,10 @@ playsound minecraft:entity.experience_orb.pickup player @a[tag=sp_player] ~ ~ ~ 
 # --- Re-count actual money on hand (just in case) ---
 execute as @a[tag=sp_player] store result score @s sp_money run clear @s minecraft:gold_nugget[minecraft:custom_data~{sp_money:true}] 0
 
+# --- Snapshot money for 50% cap ---
+execute as @a[tag=sp_player] run scoreboard players operation @s sp_money_snapshot = @s sp_money
 
 # --- Broadcast ---
-tellraw @a ["",{"text":"═══════════════════════════════","color":"dark_purple","strikethrough":true},{"text":"\n"},{"text":"  [Round "},{"score":{"name":"#game","objective":"sp_round"}},{"text":"/7] ","color":"gold","bold":true},{"text":"Place Your Bets!","color":"yellow"},{"text":"\n"},{"text":"  Drag money into the open slots.","color":"gray"},{"text":"\n"},{"text":"  Hold the ","color":"gray"},{"text":"✓ Ready!","color":"green","bold":true},{"text":" item and right-click.","color":"gray"},{"text":"\n"},{"text":"═══════════════════════════════","color":"dark_purple","strikethrough":true}]
+tellraw @a ["",{"text":"═══════════════════════════════","color":"dark_purple","strikethrough":true},{"text":"\n"},{"text":"  [Round "},{"score":{"name":"#game","objective":"sp_round"}},{"text":"/7] ","color":"gold","bold":true},{"text":"Place Your Bets!","color":"yellow"},{"text":"\n"},{"text":"  Drag money into the open slots.","color":"gray"},{"text":"\n"},{"text":"  Hold the ","color":"gray"},{"text":"✓ Ready!","color":"green","bold":true},{"text":" item and right-click.","color":"gray"},{"text":"\n"},{"text":"  ⚠ Max 50% of your money per slot!","color":"red","italic":true},{"text":"\n"},{"text":"═══════════════════════════════","color":"dark_purple","strikethrough":true}]
 
 playsound minecraft:block.note_block.pling player @a[tag=sp_player] ~ ~ ~ 1.0 1.0

@@ -31,6 +31,13 @@ scoreboard objectives add sp_bet_estate dummy
 scoreboard objectives add sp_bet_startup dummy
 scoreboard objectives add sp_bet_tech dummy
 
+# --- Balance Patch: Cap & Totals ---
+scoreboard objectives add sp_money_snapshot dummy
+scoreboard objectives add sp_total_crypto dummy
+scoreboard objectives add sp_total_estate dummy
+scoreboard objectives add sp_total_startup dummy
+scoreboard objectives add sp_total_tech dummy
+
 # --- Display ---
 scoreboard objectives setdisplay sidebar sp_money
 

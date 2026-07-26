@@ -42,6 +42,11 @@ scoreboard players set @a sp_bet_crypto 0
 scoreboard players set @a sp_bet_estate 0
 scoreboard players set @a sp_bet_startup 0
 scoreboard players set @a sp_bet_tech 0
+scoreboard players set @a sp_money_snapshot 0
+scoreboard players set #totals sp_total_crypto 0
+scoreboard players set #totals sp_total_estate 0
+scoreboard players set #totals sp_total_startup 0
+scoreboard players set #totals sp_total_tech 0
 tag @a remove sp_player
 tag @a remove sp_near_board
 
