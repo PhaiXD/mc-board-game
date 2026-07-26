@@ -12,11 +12,11 @@ execute if score #advance_from sp_temp matches 0 if score #game sp_expected matc
 execute if score #advance_from sp_temp matches 0 if score #game sp_expected matches 1.. run tellraw @a[tag=sp_near_board] ["",{"text":"[BG] ","color":"dark_purple"},{"text":"Game starting! Stay near the board!","color":"gold"}]
 execute if score #advance_from sp_temp matches 0 if score #game sp_expected matches 1.. run playsound minecraft:block.note_block.bell player @a[tag=sp_near_board] ~ ~ ~ 1.0 1.0
 
-# --- IN-GAME: Force advance (admin) ---
-execute if score #advance_from sp_temp matches 1 run function board_game:start_phase_2
-execute if score #advance_from sp_temp matches 2 run function board_game:resolve_all
-execute if score #advance_from sp_temp matches 2 if score #game sp_round matches ..6 run function board_game:start_phase_1
-execute if score #advance_from sp_temp matches 2 if score #game sp_round matches 7.. run function board_game:end_game
+# --- IN-GAME: Force resolve (admin) ---
+execute if score #advance_from sp_temp matches 1 run function board_game:resolve
+execute if score #advance_from sp_temp matches 1 run scoreboard players operation #check_round sp_temp = #game sp_round
+execute if score #advance_from sp_temp matches 1 if score #check_round sp_temp matches ..6 run function board_game:start_phase_1
+execute if score #advance_from sp_temp matches 1 if score #check_round sp_temp matches 7.. run function board_game:end_game
 
 execute if score #advance_from sp_temp matches 1.. run tellraw @a ["",{"text":"[BG] ","color":"dark_purple","bold":true},{"text":"⏩ Phase advanced!","color":"yellow"}]
 execute if score #advance_from sp_temp matches 1.. run playsound minecraft:block.note_block.bell player @a ~ ~ ~ 1.0 1.0

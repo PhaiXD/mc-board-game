@@ -1,5 +1,5 @@
 # ============================================================
-# Board Game — Tick Loop
+# Board Game — Tick Loop (Cards = Money, Turn-Based)
 # ============================================================
 
 # ================================================
@@ -8,19 +8,18 @@
 tag @a remove sp_near_board
 execute as @e[type=interaction,tag=sp_control_btn,limit=1] at @s run tag @a[distance=..10] add sp_near_board
 
-# Lobby idle message & particles
+# Lobby idle message
 execute if score #game sp_phase matches 0 if score #game sp_countdown matches ..-1 as @a[tag=sp_near_board] run title @s actionbar ["",{"text":"Board Game","color":"gold","bold":true},{"text":" — Click button to start!","color":"gray"}]
 
-# Update text display above the button with current players
+# Update text display above the button
 execute if score #game sp_phase matches 0 as @e[type=text_display,tag=sp_control_text] run data modify entity @s text set value ["",{"text":"🕹 Click to Start Game!\n","color":"gold","bold":true},{"text":"Players in zone:\n","color":"gray"},{"selector":"@a[tag=sp_near_board]","color":"aqua"}]
 
 # ================================================
 # 0B) COUNTDOWN (5 seconds)
 # ================================================
-# Check current nearby count
 execute if score #game sp_phase matches 0 if score #game sp_countdown matches 1.. store result score #current_near sp_temp if entity @a[tag=sp_near_board]
 
-# Cancel if player count changed and notify who left/entered
+# Cancel if player count changed
 execute if score #game sp_phase matches 0 if score #game sp_countdown matches 1.. unless score #current_near sp_temp = #game sp_expected as @a[tag=sp_was_near,tag=!sp_near_board] run title @a actionbar ["",{"selector":"@s","color":"red"},{"text":" left the zone!","color":"gray"}]
 execute if score #game sp_phase matches 0 if score #game sp_countdown matches 1.. unless score #current_near sp_temp = #game sp_expected as @a[tag=sp_was_near,tag=!sp_near_board] run tellraw @a ["",{"text":"[BG] ","color":"dark_purple"},{"selector":"@s","color":"red"},{"text":" left the zone! Countdown cancelled.","color":"gray"}]
 
@@ -52,89 +51,56 @@ execute if score #game sp_phase matches 0 if score #game sp_countdown matches 0 
 execute if score #game sp_phase matches 0 if score #game sp_countdown matches 0 run function board_game:start_game
 
 # ================================================
-# 1) CONSUME STALE CLICKS (exploit: clicking zones outside Phase 2)
+# 1) CONSUME STALE CLICKS (outside play phase)
 # ================================================
-execute unless score #game sp_phase matches 2 as @e[type=interaction,tag=sp_interact_crypto] if data entity @s interaction run data remove entity @s interaction
-execute unless score #game sp_phase matches 2 as @e[type=interaction,tag=sp_interact_estate] if data entity @s interaction run data remove entity @s interaction
-execute unless score #game sp_phase matches 2 as @e[type=interaction,tag=sp_interact_startup] if data entity @s interaction run data remove entity @s interaction
-execute unless score #game sp_phase matches 2 as @e[type=interaction,tag=sp_interact_tech] if data entity @s interaction run data remove entity @s interaction
-
-# ================================================
-# 2) INVENTORY: Money protection + UI lock
-# ================================================
-execute as @a[tag=sp_player] run function board_game:check_exchange
-execute as @a[tag=sp_player] run function board_game:update_money
-
-# Count money BEFORE lock (to detect money lost in glass slots)
-execute if score #game sp_phase matches 1.. as @a[tag=sp_player] store result score @s sp_temp run clear @s minecraft:gold_nugget[minecraft:custom_data~{sp_money:true}] 0
-
-# Global Money Drop Protection (prevent stealing)
-execute as @e[type=item,nbt={Item:{components:{"minecraft:custom_data":{sp_money:true}}}}] unless data entity @s Owner run data modify entity @s Owner set from entity @p UUID
-
-
-# Lock inventory slots
-execute if score #game sp_phase matches 1.. as @a[tag=sp_player] run function board_game:ui/lock_slots
-
-# Count money AFTER lock
-execute if score #game sp_phase matches 1.. as @a[tag=sp_player] store result score @s sp_calc run clear @s minecraft:gold_nugget[minecraft:custom_data~{sp_money:true}] 0
-
-# Refund any money destroyed by lock_slots
-execute if score #game sp_phase matches 1.. as @a[tag=sp_player] run scoreboard players operation @s sp_temp -= @s sp_calc
-execute if score #game sp_phase matches 1.. as @a[tag=sp_player,scores={sp_temp=1..}] store result storage board_game:refund count int 1 run scoreboard players get @s sp_temp
-execute if score #game sp_phase matches 1.. as @a[tag=sp_player,scores={sp_temp=1..}] run function board_game:ui/refund_money with storage board_game:refund
+execute unless score #game sp_phase matches 1 as @e[type=interaction,tag=sp_interact_crypto] if data entity @s interaction run data remove entity @s interaction
+execute unless score #game sp_phase matches 1 as @e[type=interaction,tag=sp_interact_estate] if data entity @s interaction run data remove entity @s interaction
+execute unless score #game sp_phase matches 1 as @e[type=interaction,tag=sp_interact_startup] if data entity @s interaction run data remove entity @s interaction
+execute unless score #game sp_phase matches 1 as @e[type=interaction,tag=sp_interact_tech] if data entity @s interaction run data remove entity @s interaction
 
 # ================================================
-# 3) CONFIRM BUTTON (carrot_on_a_stick at slot 8)
+# 2) PLAY PHASE: Actionbar
 # ================================================
-# Only process click if they aren't already confirmed (sp_confirm=0)
-execute as @a[tag=sp_player,scores={sp_use_click=1..,sp_confirm=0}] if score #game sp_phase matches 1..3 run scoreboard players set @s sp_confirm 1
+
+# Show actionbar: Play or Ready
+execute if score #game sp_phase matches 1 as @a[tag=sp_player,tag=!sp_ready] run title @s actionbar ["",{"text":"🎯 PLAY CARDS","color":"gold","bold":true},{"text":" — Right-click Pass when ready","color":"white"}]
+execute if score #game sp_phase matches 1 as @a[tag=sp_player,tag=sp_ready] run title @s actionbar ["",{"text":"✅ READY","color":"green","bold":true},{"text":" — Waiting for others...","color":"gray"}]
+
+# ================================================
+# 3) PLAY PHASE: Card Detection on Zones
+# ================================================
+execute if score #game sp_phase matches 1 as @e[type=interaction,tag=sp_interact_crypto] if data entity @s interaction at @s run function board_game:detect/crypto
+execute if score #game sp_phase matches 1 as @e[type=interaction,tag=sp_interact_estate] if data entity @s interaction at @s run function board_game:detect/estate
+execute if score #game sp_phase matches 1 as @e[type=interaction,tag=sp_interact_startup] if data entity @s interaction at @s run function board_game:detect/startup
+execute if score #game sp_phase matches 1 as @e[type=interaction,tag=sp_interact_tech] if data entity @s interaction at @s run function board_game:detect/tech
+
+# ================================================
+# 4) PLAY PHASE: Ready Detection (carrot_on_a_stick)
+# ================================================
+execute as @a[tag=sp_player,scores={sp_use_click=1..}] if score #game sp_phase matches 1 run function board_game:toggle_ready
 scoreboard players set @a sp_use_click 0
 
-# ================================================
-# 4) TRIGGER DETECTION — /trigger sp_confirm
-# ================================================
-# When confirming in Phase 1, capture their current bets
-execute as @a[tag=sp_player,scores={sp_confirm=1}] if score #game sp_phase matches 1 run function board_game:read_bets
+# Check if ALL players are ready
+execute if score #game sp_phase matches 1 store result score #ready_count sp_temp if entity @a[tag=sp_player,tag=sp_ready]
+execute if score #game sp_phase matches 1 if score #ready_count sp_temp >= #game sp_player_count run scoreboard players operation #check_round sp_temp = #game sp_round
+execute if score #game sp_phase matches 1 if score #ready_count sp_temp >= #game sp_player_count run function board_game:resolve
 
-# Broadcast ready message
-execute as @a[tag=sp_player,scores={sp_confirm=1}] run tellraw @a ["",{"text":"[BG] ","color":"dark_purple","bold":true},{"selector":"@s","color":"gold"},{"text":" is ready! ✓","color":"green"}]
-execute as @a[tag=sp_player,scores={sp_confirm=1}] run playsound minecraft:block.note_block.chime player @s ~ ~ ~ 1.0 1.5
-execute as @a[tag=sp_player,scores={sp_confirm=1}] run scoreboard players set @s sp_confirm 2
-
-# In Phase 1, check if anyone with sp_confirm=2 has modified their bets
-execute as @a[tag=sp_player,scores={sp_confirm=2}] if score #game sp_phase matches 1 run function board_game:check_bets
-
-# Enable trigger for all players
-scoreboard players enable @a sp_confirm
+execute if score #ready_count sp_temp >= #game sp_player_count if score #check_round sp_temp matches ..6 run function board_game:start_phase_1
+execute if score #ready_count sp_temp >= #game sp_player_count if score #check_round sp_temp matches 7.. run function board_game:end_game
+execute if score #ready_count sp_temp >= #game sp_player_count run scoreboard players set #ready_count sp_temp 0
 
 # ================================================
-# 5) AUTO-ADVANCE — when all game players confirmed
+# 5) Update card count sidebar
 # ================================================
-execute store result score #total sp_temp if entity @a[tag=sp_player]
-execute store result score #ready sp_temp if entity @a[tag=sp_player,scores={sp_confirm=2..}]
-scoreboard players operation #phase_snap sp_temp = #game sp_phase
-
-execute if score #phase_snap sp_temp matches 1 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp run function board_game:start_phase_2
-execute if score #phase_snap sp_temp matches 2 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp run function board_game:resolve_all
-execute if score #phase_snap sp_temp matches 2 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp if score #game sp_round matches ..6 run function board_game:start_phase_1
-execute if score #phase_snap sp_temp matches 2 if score #total sp_temp matches 1.. if score #ready sp_temp = #total sp_temp if score #game sp_round matches 7.. run function board_game:end_game
+execute if score #game sp_phase matches 1 as @a[tag=sp_player] store result score @s sp_cards run clear @s minecraft:paper[minecraft:custom_data~{sp_card:true}] 0
 
 # ================================================
-# 6) PHASE 2: Card detection on zones
-# ================================================
-execute if score #game sp_phase matches 2 as @e[type=interaction,tag=sp_interact_crypto] if data entity @s interaction at @s run function board_game:detect/crypto
-execute if score #game sp_phase matches 2 as @e[type=interaction,tag=sp_interact_estate] if data entity @s interaction at @s run function board_game:detect/estate
-execute if score #game sp_phase matches 2 as @e[type=interaction,tag=sp_interact_startup] if data entity @s interaction at @s run function board_game:detect/startup
-execute if score #game sp_phase matches 2 as @e[type=interaction,tag=sp_interact_tech] if data entity @s interaction at @s run function board_game:detect/tech
-
-# ================================================
-# 7) CONTROL BUTTON
+# 6) CONTROL BUTTON
 # ================================================
 execute as @e[type=interaction,tag=sp_control_btn] if data entity @s interaction at @s run function board_game:control_advance
 
-# Bankrupt check removed to prevent cursor-item bug
 # ================================================
-# 9) UPDATE PREVIOUS ZONE STATE
+# 7) UPDATE PREVIOUS ZONE STATE
 # ================================================
 tag @a remove sp_was_near
 tag @a[tag=sp_near_board] add sp_was_near

@@ -15,6 +15,9 @@ scoreboard players set #game sp_phase 0
 scoreboard players set #game sp_round 0
 scoreboard players set #game sp_countdown -1
 scoreboard players set #game sp_expected 0
+scoreboard players set #game sp_current_turn 0
+scoreboard players set #game sp_consecutive_passes 0
+scoreboard players set #game sp_player_count 0
 
 # Reset board
 scoreboard players set #crypto sp_board_crypto 0
@@ -23,8 +26,6 @@ scoreboard players set #startup sp_board_startup 0
 scoreboard players set #tech sp_board_tech 0
 
 # Clear ALL game items
-clear @a minecraft:gold_nugget[minecraft:custom_data~{sp_money:true}]
-clear @a minecraft:diamond[minecraft:custom_data~{sp_money:true}]
 clear @a minecraft:paper[minecraft:custom_data~{sp_card:true}]
 clear @a minecraft:gray_stained_glass_pane[minecraft:custom_data~{sp_ui:true}]
 clear @a minecraft:red_stained_glass_pane[minecraft:custom_data~{sp_ui:true}]
@@ -35,14 +36,16 @@ clear @a minecraft:lime_stained_glass_pane[minecraft:custom_data~{sp_ui:true}]
 clear @a minecraft:carrot_on_a_stick[minecraft:custom_data~{sp_confirm_btn:true}]
 
 # Reset player scores & tags
-scoreboard players set @a sp_money 0
+scoreboard players set @a sp_cards 0
 scoreboard players set @a sp_cards_played 0
-scoreboard players set @a sp_confirm 0
-scoreboard players set @a sp_bet_crypto 0
-scoreboard players set @a sp_bet_estate 0
-scoreboard players set @a sp_bet_startup 0
-scoreboard players set @a sp_bet_tech 0
+scoreboard players set @a sp_turn_order 0
+scoreboard players set @a sp_played_crypto 0
+scoreboard players set @a sp_played_estate 0
+scoreboard players set @a sp_played_startup 0
+scoreboard players set @a sp_played_tech 0
+scoreboard players set @a sp_draw_count 0
 tag @a remove sp_player
 tag @a remove sp_near_board
+tag @a remove sp_current_turn
 
 tellraw @a ["",{"text":"[BG] ","color":"dark_purple","bold":true},{"text":"Full reset complete.","color":"gray"}]
