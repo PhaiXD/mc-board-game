@@ -1,2 +1,2 @@
 # mc-board-game
-A Minecraft datapack for testing gameplay mechanics and rules for a competition.
+A Minecraft data pack for testing competitive gameplay mechanics and rules (for Minecraft version 1.21.11).
